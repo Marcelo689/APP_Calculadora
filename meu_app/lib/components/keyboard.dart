@@ -3,97 +3,135 @@ import "button.dart";
 import "button_row.dart";
 
 class Keyboard extends StatelessWidget {
- 
+  final void Function(String inputText) func;
 
-  @override
+  Keyboard(this.func);
   Widget build(BuildContext context) {
     return Container(
-      height:500,
-      child:Column(
-        children:<Widget>[
+      height: 500,
+      child: Column(
+        children: <Widget>[
           ButtonRow([
             Button(
-              text:("√"),
+              text: ("√"),
+              func: func,
+              color: Button.DARK,
             ),
             Button(
-              text:("("),
+              text: ("("),
+              func: func,
+              color: Button.DARK,
             ),
             Button(
-              text:(")"),
+              text: (")"),
+              func: func,
+              color: Button.DARK,
             ),
             Button(
-              text:("Bhaskara"),
+              text: ("Bhaskara"),
+              func: func,
+              color: Button.DARK,
+            ),
+          ]),
+          ButtonRow([
+            Button.delete(
+              text: ("AC"),
+              func: func,
+            ),
+            Button(
+              text: ("^"),
+              func: func,
+              color: Button.DARK,
+            ),
+            Button.delete(
+              text: ("Backspace"),
+              func: func,
+            ),
+            Button.operation(
+              text: ("÷"),
+              func: func,
             ),
           ]),
           ButtonRow([
             Button(
-              text:("(x)"),
+              text: ("7"),
+              func: func,
             ),
             Button(
-              text:("^"),
+              text: ("8"),
+              func: func,
             ),
             Button(
-              text:("Delete"),
+              text: ("9"),
+              func: func,
             ),
-            Button(
-              text:("÷"),
-            ),
-          ]),
-          ButtonRow([
-            Button(
-              text:("7"),
-            ),
-            Button(
-              text:("8"),
-            ),
-            Button(
-              text:("9"),
-            ),
-            Button(
-              text:("X"),
+            Button.operation(
+              text: ("X"),
+              func: func,
             ),
           ]),
           ButtonRow([
             Button(
-              text:("4"),
+              text: ("4"),
+              func: func,
             ),
             Button(
-              text:("5"),
+              text: ("5"),
+              func: func,
             ),
             Button(
-              text:("6"),
+              text: ("6"),
+              func: func,
             ),
-            Button(
-              text:("-"),
-            ),
-          ]),
-          ButtonRow([
-            Button(
-              text:("1"),
-            ),
-            Button(
-              text:("2"),
-            ),
-            Button(
-              text:("3"),
-            ),
-            Button(
-              text:("+"),
+            Button.operation(
+              text: ("-"),
+              func: func,
             ),
           ]),
           ButtonRow([
             Button(
-              text:("0"),
+              text: ("1"),
+              func: func,
             ),
             Button(
-              text:("."),
+              text: ("2"),
+              func: func,
             ),
             Button(
-              text:("="),
+              text: ("3"),
+              func: func,
+            ),
+            Button.operation(
+              text: ("+"),
+              func: func,
+            ),
+          ]),
+          ButtonRow([
+            Button(
+              text: ("0"),
+              func: func,
+            ),
+            Button(
+              text: ("x"),
+              func: func,
+            ),
+            Button(
+              text: ("."),
+              func: func,
+            ),
+            Button.operation(
+              text: ("="),
+              func: func,
+            ),
+          ]),
+          ButtonRow([
+            Button.big(
+              text: ("Calculate"),
+              func: func,
             ),
           ]),
         ],
-        ),
+      ),
     );
   }
 }
