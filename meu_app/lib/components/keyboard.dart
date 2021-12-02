@@ -33,6 +33,7 @@ class Keyboard extends StatelessWidget {
               color: Button.DARK,
             ),
           ]),
+          SizedBox(height: 1),
           ButtonRow([
             Button.delete(
               text: ("AC"),
@@ -52,6 +53,7 @@ class Keyboard extends StatelessWidget {
               func: func,
             ),
           ]),
+          SizedBox(height: 1),
           ButtonRow([
             Button(
               text: ("7"),
@@ -70,6 +72,7 @@ class Keyboard extends StatelessWidget {
               func: func,
             ),
           ]),
+          SizedBox(height: 1),
           ButtonRow([
             Button(
               text: ("4"),
@@ -88,6 +91,7 @@ class Keyboard extends StatelessWidget {
               func: func,
             ),
           ]),
+          SizedBox(height: 1),
           ButtonRow([
             Button(
               text: ("1"),
@@ -106,6 +110,7 @@ class Keyboard extends StatelessWidget {
               func: func,
             ),
           ]),
+          SizedBox(height: 1),
           ButtonRow([
             Button(
               text: ("0"),
@@ -124,12 +129,14 @@ class Keyboard extends StatelessWidget {
               func: func,
             ),
           ]),
+          SizedBox(height: 1),
           ButtonRow([
             Button.big(
               text: ("Calculate"),
               func: func,
             ),
           ]),
+          SizedBox(height: 1),
         ],
       ),
     );
