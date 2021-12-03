@@ -112,13 +112,15 @@ parenteses(String input) {
       parentesesE = i;
     }
   }
-  for (int i = 0; i < input.length; i++) {
+  for (int i = 0; i < input.length - 1; i++) {
     if (input[i] == ")") {
       parentesesD = i;
       break;
     }
   }
-  input = input.substring(parentesesE, parentesesD);
+  print("parenteses direito = " + parentesesD.toString());
+  input = input.substring(parentesesE + 1, parentesesD);
+  print("saida = " + input);
   return input;
 }
 
@@ -153,7 +155,9 @@ dividirPartes(String input) {
         num2 = num3 + "x";
         //print("fez cagada");
       } else {
-        sinal = input[i];
+        if (sinal == "") {
+          sinal = input[i];
+        }
         if (num1 == "") {
           num1 = num3;
         } else {
@@ -181,7 +185,7 @@ calcularParte(String input) {
   int numOfX = 0;
   print(input);
   print("\n");
-  //input = parenteses(input);
+  input = parenteses(input);
   print(input);
   print("\n");
   Calculo listInputs = (dividirPartes(input));

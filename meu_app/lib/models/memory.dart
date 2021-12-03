@@ -8,6 +8,10 @@ class Memory {
   }
 
   void applyCommand(String command) {
+    if (_value == "0") {
+      _value = command;
+      return;
+    }
     if (command == "Calculate") {
       _value = calcularParte(_value);
       return;
