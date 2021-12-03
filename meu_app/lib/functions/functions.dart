@@ -1,3 +1,7 @@
+import 'dart:math';
+
+import 'package:meu_app/models/separarLadosdoIgual.dart';
+
 import 'calculo.dart';
 
 isNumeric(String s) {
@@ -24,6 +28,7 @@ retirandoXElevado(String input) {
       nums = "";
     }
   }
+  return xElevado;
 }
 
 separarLados(String input) {
@@ -53,37 +58,38 @@ separarLados(String input) {
       direita.replaceAll(mapeando[contador].toString(), "");
     }
 
-    return [esquerda, direita, incalculavel1, incalculavel2];
+    return Lados(esquerda, direita, incalculavel1, incalculavel2);
+  }
+}
+
+resolverRaizesQ(String stringCompleta) {
+  List<String> operations = ["+", "-", "X", "÷", "^"];
+  while (stringCompleta.indexOf("√") != -1) {
+    int indiceRaiz = stringCompleta.indexOf("√");
+    String conteudoDaRaiz = "";
+    for (int i = indiceRaiz + 1; i < stringCompleta.length - 1; i++) {
+      if (isNumeric(stringCompleta[i])) {
+        conteudoDaRaiz += stringCompleta[i];
+      } else {
+        break;
+      }
+    }
+    double conteudo = double.parse(conteudoDaRaiz);
+    double resultado = sqrt(conteudo);
+    stringCompleta.replaceAll("√" + conteudoDaRaiz, resultado.toString());
   }
 }
 
 calcularTudo(String input) {
   List<String> incalculavel1 = [];
   List<String> incalculavel2 = [];
-  List<String> temp = [];
   int contador = 0;
   if (input.indexOf("=") != -1) {
-    String esquerda = input.split("=")[0];
-    String direita = input.split("=")[1];
-    temp = retirandoXElevado(esquerda);
-    var mapeando = temp.asMap();
-
-    //adicionando lado esquerdo do sinal de igual para um lista de incalculaveis
-    while (mapeando.length > contador) {
-      incalculavel1.add(mapeando[contador].toString());
-      esquerda.replaceAll(mapeando[contador].toString(), "");
-    }
-    contador = 0;
-    mapeando.clear();
-    List<String> temp1 = retirandoXElevado(direita);
-    mapeando = temp1.asMap();
-
-    //adicionando lado direito do igual dos incalculaveis x^2
-    while (mapeando.length > contador) {
-      incalculavel2.add(mapeando[contador].toString());
-      direita.replaceAll(mapeando[contador].toString(), "");
-    }
-
+    Lados retorno = separarLados(input);
+    String esquerda = retorno.esquerdaGet;
+    String direita = retorno.direitaGet;
+    incalculavel1 = retorno.incalculavelEGet;
+    incalculavel2 = retorno.incalculavelDGet;
     while (!isNumeric(esquerda)) {
       esquerda = calcularParte(esquerda);
     }
@@ -126,10 +132,15 @@ efetuarCalculo(String input) {
     } else if (num1 != "" && (isNumeric(input[i]) || input[i] == "-")) {
       num3 += input[i];
     } else {
-      if (input[i] == "²") {
-        num1 = "0";
-      }
-      if (input[i] == "x" && num1 == "") {
+      if (input[i] == "^" && num1 == "") {
+        num3 += "^";
+      } else if (input[i] == "^" && num1 != "") {
+        num3 += "^";
+      } else if (input[i - 1] == "^" && num1 == "") {
+        num1 = num3 + input[i];
+      } else if (input[i - 1] == "^" && num1 != "") {
+        num2 = num3 + input[i];
+      } else if (input[i] == "x" && num1 == "") {
         num1 = num3 + "x";
       } else if (input[i] == "x" && num1 != "") {
         num2 = num3 + "x";
@@ -137,9 +148,14 @@ efetuarCalculo(String input) {
         num2 = num3;
       } else {
         sinal = input[i];
-        num1 = num3;
+        if (num1 == "") {
+          num1 = num3;
+        } else {
+          num2 = num3;
+          break;
+        }
+        num3 = "";
       }
-      num3 = "";
     }
   }
   Calculo list = new Calculo(num1, num2, sinal);
@@ -157,6 +173,9 @@ calcularParte(String input) {
 
   String input1 = listInputs.num1Get.toString();
   String input2 = listInputs.num2Get.toString();
+  String sinal = listInputs.sinal;
+  String stringCalculada = input1 + sinal + input2;
+  String resultadoX = "";
   if (input1[input1.length - 1] == "x" && input2[input2.length - 1] == "x") {
     numOfX = 2;
   } else if (input1[input1.length - 1] == "x") {
@@ -164,16 +183,92 @@ calcularParte(String input) {
   } else if (input2[input2.length - 1] == "x") {
     numOfX = 1;
   }
-  String sinal = listInputs.sinal;
-  String stringCalculada = input1 + sinal + input2;
+  List<double> resultados = [];
+  double? resultado = 0;
+  List<String> numerosPower = [];
+  if (input1.indexOf("^") != -1) {
+    numerosPower = input1.split("^");
 
-  double resultado = 0;
-  String resultadoX = "";
-  switch (sinal) {
-    case "X":
-      resultado = num1 * num2;
-      break;
+    resultado = pow(double.parse(numerosPower[0].toString()),
+        double.parse(numerosPower[1])) as double;
+    resultados.add(resultado);
+    stringCompleta.replaceAll(input1, resultado.toString());
+    num1 = resultado;
   }
+  numerosPower = [];
+  if (input2.indexOf("^") != -1) {
+    numerosPower = input2.split("^");
+
+    resultado = pow(double.parse(numerosPower[0].toString()),
+        double.parse(numerosPower[1])) as double;
+    resultados.add(resultado);
+    stringCompleta.replaceAll(input2, resultado.toString());
+    num2 = resultado;
+    // valores da potencia 1 e 2
+  }
+  if (input2.indexOf("^") != -1 && input1.indexOf("^") != -1) {
+    switch (sinal) {
+      case "X":
+        resultado = num1 * num2;
+        switch (numOfX) {
+          case 0:
+            break;
+          case 1:
+            resultadoX = resultado.toString() + "x";
+            break;
+          case 2:
+            resultadoX = resultado.toString() + "x^2";
+            break;
+        }
+        break;
+
+      case "÷":
+        resultado = num1 / num2;
+        switch (numOfX) {
+          case 0:
+            break;
+          case 1:
+            resultadoX = resultado.toString() + "x";
+            break;
+          case 2:
+            resultadoX = resultado.toString() + "x^2";
+            break;
+        }
+        break;
+      case "-":
+        switch (numOfX) {
+          case 0:
+            resultado = num1 - num2;
+            break;
+          case 1:
+            resultadoX = num1.toString() + sinal + num2.toString();
+            break;
+          case 2:
+            resultado = num1 - num2;
+            resultadoX = resultado.toString() + "x";
+            break;
+        }
+        break;
+      case "+":
+        switch (numOfX) {
+          case 0:
+            resultado = num1 + num2;
+            break;
+          case 1:
+            resultadoX = num1.toString() + sinal + num2.toString();
+            break;
+          case 2:
+            resultado = num1 + num2;
+            resultadoX = resultado.toString() + "x";
+            break;
+        }
+        break;
+      case "√":
+        resultado = sqrt(num1);
+        break;
+    }
+  }
+
   switch (numOfX) {
     case 0:
       break;

@@ -1,13 +1,16 @@
 import 'package:flutter/cupertino.dart';
+import 'package:meu_app/functions/functions.dart';
 
 class Memory {
   String _value = "0";
-
   String get value {
     return _value;
   }
 
   void applyCommand(String command) {
+    if (command == "Calculate") {
+      _value = calcularTudo(_value);
+    }
     if (command == "AC") {
       _value = "0";
       return;
@@ -17,6 +20,13 @@ class Memory {
       } else {
         _value = "0";
       }
+      return;
+    } else if (_value.indexOf("=") != -1) {
+      if (command == "=") {
+        return;
+      }
+    } else if ((!isNumeric(_value[_value.length - 1]) || command == "x") &&
+        !isNumeric(command)) {
       return;
     }
     _value += command;
