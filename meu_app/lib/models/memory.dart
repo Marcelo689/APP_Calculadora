@@ -9,7 +9,8 @@ class Memory {
 
   void applyCommand(String command) {
     if (command == "Calculate") {
-      _value = calcularTudo(_value);
+      _value = calcularParte(_value);
+      return;
     }
     if (command == "AC") {
       _value = "0";

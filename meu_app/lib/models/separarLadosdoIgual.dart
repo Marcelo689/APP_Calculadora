@@ -1,6 +1,6 @@
 class Lados {
-  final String esquerda = "";
-  final String direita = "";
+  String esquerda = "";
+  String direita = "";
   List<String> incalculavelE = [];
   List<String> incalculavelD = [];
 

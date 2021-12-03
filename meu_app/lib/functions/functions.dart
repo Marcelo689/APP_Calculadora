@@ -97,6 +97,7 @@ calcularTudo(String input) {
       direita = calcularParte(direita);
     }
   }
+
   while (!isNumeric(input)) {
     input = calcularParte(input);
   }
@@ -121,16 +122,22 @@ parenteses(String input) {
   return input;
 }
 
-efetuarCalculo(String input) {
+dividirPartes(String input) {
   String num1 = "";
   String num2 = "";
   String num3 = "";
   String sinal = "";
+  print("\n" + input + "\n");
   for (int i = 0; i < input.length; i++) {
+    print("\n" + input[i] + "\n");
     if ((isNumeric(input[i]) || input[i] == "-") && num1 == "") {
       num3 += input[i];
     } else if (num1 != "" && (isNumeric(input[i]) || input[i] == "-")) {
+      //print("diferente de vazio");
       num3 += input[i];
+      if (i == input.length - 1) {
+        num2 = num3;
+      }
     } else {
       if (input[i] == "^" && num1 == "") {
         num3 += "^";
@@ -144,13 +151,13 @@ efetuarCalculo(String input) {
         num1 = num3 + "x";
       } else if (input[i] == "x" && num1 != "") {
         num2 = num3 + "x";
-      } else if (num1 != "") {
-        num2 = num3;
+        //print("fez cagada");
       } else {
         sinal = input[i];
         if (num1 == "") {
           num1 = num3;
         } else {
+          print("tentou");
           num2 = num3;
           break;
         }
@@ -159,21 +166,32 @@ efetuarCalculo(String input) {
     }
   }
   Calculo list = new Calculo(num1, num2, sinal);
-
+  print("Calculo \n num1=" +
+      num1.toString() +
+      "\n num2=" +
+      num2.toString() +
+      "\n sinal = " +
+      sinal);
   return list;
 }
 
 calcularParte(String input) {
   String stringCompleta = input;
+  String stringResultado = "";
   int numOfX = 0;
-  input = parenteses(input);
-  Calculo listInputs = (efetuarCalculo(input));
-  double num1 = (listInputs.num1Get);
-  double num2 = (listInputs.num2Get);
-
+  print(input);
+  print("\n");
+  //input = parenteses(input);
+  print(input);
+  print("\n");
+  Calculo listInputs = (dividirPartes(input));
+  double num1 = double.parse(listInputs.num1Get);
+  double num2 = double.parse(listInputs.num2Get);
+  print("num1=" + num1.toString() + "\n num2=" + num2.toString());
   String input1 = listInputs.num1Get.toString();
   String input2 = listInputs.num2Get.toString();
   String sinal = listInputs.sinal;
+  print(sinal);
   String stringCalculada = input1 + sinal + input2;
   String resultadoX = "";
   if (input1[input1.length - 1] == "x" && input2[input2.length - 1] == "x") {
@@ -186,6 +204,8 @@ calcularParte(String input) {
   List<double> resultados = [];
   double? resultado = 0;
   List<String> numerosPower = [];
+
+  /// potencia
   if (input1.indexOf("^") != -1) {
     numerosPower = input1.split("^");
 
@@ -206,10 +226,12 @@ calcularParte(String input) {
     num2 = resultado;
     // valores da potencia 1 e 2
   }
-  if (input2.indexOf("^") != -1 && input1.indexOf("^") != -1) {
+
+  if (input2.indexOf("^") == -1 && input1.indexOf("^") == -1) {
     switch (sinal) {
       case "X":
         resultado = num1 * num2;
+        print("resultado= " + resultado.toString());
         switch (numOfX) {
           case 0:
             break;
@@ -279,10 +301,17 @@ calcularParte(String input) {
       resultadoX = resultado.toString() + "x^2";
       break;
   }
+  print("Calcular Parte \n Resultado=" +
+      resultado.toString() +
+      "\n resultadoX=" +
+      resultadoX);
   if (resultadoX != "") {
-    stringCompleta.replaceAll(stringCalculada, resultadoX);
+    stringResultado = stringCompleta.replaceAll(stringCalculada, resultadoX);
   } else {
-    stringCompleta.replaceAll(stringCalculada, resultado.toString());
+    print(stringCompleta);
+    stringResultado =
+        stringCompleta.replaceAll(stringCalculada, resultado.toString());
+    print(stringCompleta);
   }
-  return stringCompleta;
+  return stringResultado;
 }
