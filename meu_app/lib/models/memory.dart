@@ -8,23 +8,29 @@ class Memory {
   }
 
   void applyCommand(String command) {
-    if (_value == "0") {
-      _value = command;
+    if (command == "Calculate") {
+      _value = calcularTudo(_value);
       return;
     }
-    if (command == "Calculate") {
-      _value = calcularParte(_value);
+    if (command == "Backspace") {
+      print("value=" + _value);
+      if (_value.length > 0) {
+        if (_value.length == 1) {
+          _value = "0";
+          return;
+        }
+        _value = _value.substring(0, _value.length - 1);
+      } else {
+        _value = "0";
+      }
       return;
     }
     if (command == "AC") {
       _value = "0";
       return;
-    } else if (command == "Backspace") {
-      if (_value.isNotEmpty && _value != "0") {
-        _value = _value.substring(0, _value.length - 1);
-      } else {
-        _value = "0";
-      }
+    }
+    if (_value == "0") {
+      _value = command;
       return;
     } else if (_value.indexOf("=") != -1) {
       if (command == "=") {

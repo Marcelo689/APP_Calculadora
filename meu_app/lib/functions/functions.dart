@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:math';
 
 import 'package:meu_app/models/separarLadosdoIgual.dart';
@@ -36,30 +38,14 @@ separarLados(String input) {
   List<String> incalculavel2 = [];
   List<String> temp = [];
   int contador = 0;
-  if (input.indexOf("=") != -1) {
-    String esquerda = input.split("=")[0];
-    String direita = input.split("=")[1];
-    temp = retirandoXElevado(esquerda);
-    var mapeando = temp.asMap();
+  String esquerda = input.split("=")[0];
+  String direita = input.split("=")[1];
+  //var mapeando = temp.asMap();
+  print("separar lado(esquerda)=" + esquerda);
+  print("separar lado(direita)=" + direita);
+  //adicionando lado esquerdo do sinal de igual para um lista de incalculaveis
 
-    //adicionando lado esquerdo do sinal de igual para um lista de incalculaveis
-    while (mapeando.length > contador) {
-      incalculavel1.add(mapeando[contador].toString());
-      esquerda.replaceAll(mapeando[contador].toString(), "");
-    }
-    contador = 0;
-    mapeando.clear();
-    List<String> temp1 = retirandoXElevado(direita);
-    mapeando = temp1.asMap();
-
-    //adicionando lado direito do igual dos incalculaveis x^2
-    while (mapeando.length > contador) {
-      incalculavel2.add(mapeando[contador].toString());
-      direita.replaceAll(mapeando[contador].toString(), "");
-    }
-
-    return Lados(esquerda, direita, incalculavel1, incalculavel2);
-  }
+  return Lados(esquerda, direita, incalculavel1, incalculavel2);
 }
 
 resolverRaizesQ(String stringCompleta) {
@@ -80,22 +66,96 @@ resolverRaizesQ(String stringCompleta) {
   }
 }
 
+encontrarPrioridade(String input) {
+  int indice1 = input.length;
+  int indice2 = input.length;
+  if (input.contains("^")) {
+    indice1 = input.indexOf("^");
+  }
+  if (input.contains("√")) {
+    indice2 = input.indexOf("√");
+  }
+  if (indice1 != input.length || indice2 != input.length) {
+    if (indice1 < indice2) {
+      return indice1;
+    } else {
+      return indice2;
+    }
+  }
+  if (input.contains("X")) {
+    indice1 = input.indexOf("X");
+  }
+  if (input.contains("÷")) {
+    indice2 = input.indexOf("÷");
+  }
+  if (indice1 != input.length || indice2 != input.length) {
+    if (indice1 < indice2) {
+      return indice1;
+    } else {
+      return indice2;
+    }
+  }
+  if (input.contains("+")) {
+    indice1 = input.indexOf("+");
+  }
+  if (input.contains("-")) {
+    indice2 = input.indexOf("-");
+  }
+  if (indice1 != input.length || indice2 != input.length) {
+    if (indice1 < indice2) {
+      return indice1;
+    } else {
+      return indice2;
+    }
+  }
+}
+
+pegarPartePrioritaria(String input, int indice) {
+  String ladoEsquerdo = "";
+  for (int i = indice; i >= 0; i--) {
+    if (isNumeric(input[i]) || input[i] == "-" || input[i] == "x") {
+      ladoEsquerdo += input[i];
+    } else {
+      break;
+    }
+  }
+
+  String ladoDireito = "";
+  for (int i = 0; i <= input.length - 1; i++) {
+    if (isNumeric(input[i]) || input[i] == "-" || input[i] == "x") {
+      ladoDireito += input[i];
+    } else {
+      break;
+    }
+  }
+  String sinal = input[indice];
+
+  return Calculo(ladoEsquerdo, ladoDireito, sinal);
+}
+
 calcularTudo(String input) {
   List<String> incalculavel1 = [];
   List<String> incalculavel2 = [];
   int contador = 0;
   if (input.indexOf("=") != -1) {
+    print(input);
     Lados retorno = separarLados(input);
     String esquerda = retorno.esquerdaGet;
     String direita = retorno.direitaGet;
+    print("retorno esquerda" + esquerda);
+    print("retorno direita" + direita);
     incalculavel1 = retorno.incalculavelEGet;
     incalculavel2 = retorno.incalculavelDGet;
     while (!isNumeric(esquerda)) {
       esquerda = calcularParte(esquerda);
+      print("Lado esquerdo = " + esquerda);
     }
     while (!isNumeric(direita)) {
       direita = calcularParte(direita);
+      print("Lado direito = " + direita);
     }
+    input = esquerda + "=" + direita;
+    return input;
   }
 
   while (!isNumeric(input)) {
@@ -185,16 +245,25 @@ calcularParte(String input) {
   int numOfX = 0;
   print(input);
   print("\n");
-  input = parenteses(input);
+  if (input.contains("(")) {
+    input = parenteses(input);
+  }
   print(input);
   print("\n");
   Calculo listInputs = (dividirPartes(input));
-  double num1 = double.parse(listInputs.num1Get);
-  double num2 = double.parse(listInputs.num2Get);
-  print("num1=" + num1.toString() + "\n num2=" + num2.toString());
   String input1 = listInputs.num1Get.toString();
   String input2 = listInputs.num2Get.toString();
   String sinal = listInputs.sinal;
+
+  if (input1 == "") {
+    print("Está vazio");
+    stringResultado = stringCompleta.replaceAll(stringCompleta, input);
+    return stringResultado;
+  }
+  double num1 = double.parse(listInputs.num1Get);
+  double num2 = double.parse(listInputs.num2Get);
+  print("num1=" + num1.toString() + "\n num2=" + num2.toString());
+
   print(sinal);
   String stringCalculada = input1 + sinal + input2;
   String resultadoX = "";

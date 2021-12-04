@@ -4,11 +4,11 @@ class Lados {
   List<String> incalculavelE = [];
   List<String> incalculavelD = [];
 
-  Lados(esquerda, direita, incalculaveE, incalculavelD) {
-    this.esquerda;
-    this.direita;
-    this.incalculavelE;
-    this.incalculavelD;
+  Lados(esquerda, direita, incalculavelE, incalculavelD) {
+    this.esquerda = esquerda;
+    this.direita = direita;
+    this.incalculavelE = incalculavelE;
+    this.incalculavelD = incalculavelD;
   }
   String get esquerdaGet => this.esquerda;
   String get direitaGet => this.direita;
