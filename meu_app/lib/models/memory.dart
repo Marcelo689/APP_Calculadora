@@ -1,16 +1,41 @@
 import 'package:flutter/cupertino.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meu_app/functions/functions.dart';
 
 class Memory {
   String _value = "0";
+  String _antesDoCalculo = "0";
+  List<String> operacoes = ["-", "X", "+", "÷"];
+
+  String get antes {
+    return _antesDoCalculo;
+  }
+
   String get value {
     return _value;
   }
 
   void applyCommand(String command) {
-    if (command == "Calculate") {
-      _value = calcularTudo(_value);
+    if (command == "Before Calculate") {
+      _value = _antesDoCalculo;
       return;
+    }
+    if (command == "Calculate") {
+      try {
+        if (!(_value == calcularTudo(_value))) {
+          _antesDoCalculo = _value;
+        }
+        _value = calcularTudo(_value);
+      } catch (erro) {
+        Fluttertoast.showToast(
+          msg: "Invalid Calculation",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+        );
+        throw ErrorDescription(erro.toString());
+      } finally {
+        return;
+      }
     }
     if (command == "Backspace") {
       print("value=" + _value);
@@ -38,6 +63,14 @@ class Memory {
       }
     } else if ((!isNumeric(_value[_value.length - 1]) || command == "x") &&
         !isNumeric(command)) {
+      if (operacoes.contains(_value[_value.length - 1]) && command == "(") {
+        _value += command;
+        return;
+      }
+      if ((_value[_value.length - 1] == ")") && operacoes.contains(command)) {
+        _value += command;
+        return;
+      }
       return;
     }
     _value += command;

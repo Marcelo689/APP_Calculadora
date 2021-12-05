@@ -13,6 +13,13 @@ class Keyboard extends StatelessWidget {
         children: <Widget>[
           ButtonRow([
             Button(
+              text: ("Before Calculate"),
+              func: func,
+              color: Button.DARK,
+            )
+          ]),
+          ButtonRow([
+            Button(
               text: ("√"),
               func: func,
               color: Button.DARK,
