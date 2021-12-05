@@ -119,7 +119,10 @@ pegarPartePrioritaria(String input, int indice) {
   print("119 indice=" + indice.toString());
   String ladoEsquerdo = "";
   for (int i = indice - 1; i >= 0; i--) {
-    if (isNumeric(input[i]) || input[i] == "-" || input[i] == "x") {
+    if (isNumeric(input[i]) ||
+        input[i] == "-" ||
+        input[i] == "x" ||
+        input[i] == ".") {
       ladoEsquerdo += input[i];
     } else {
       break;
@@ -128,7 +131,10 @@ pegarPartePrioritaria(String input, int indice) {
   ladoEsquerdo = ladoEsquerdo.split('').reversed.join();
   String ladoDireito = "";
   for (int i = indice + 1; i <= input.length - 1; i++) {
-    if (isNumeric(input[i]) || input[i] == "-" || input[i] == "x") {
+    if (isNumeric(input[i]) ||
+        input[i] == "-" ||
+        input[i] == "x" ||
+        input[i] == ".") {
       ladoDireito += input[i];
     } else {
       break;
@@ -145,6 +151,7 @@ pegarPartePrioritaria(String input, int indice) {
 calcularTudo(String input) {
   List<String> incalculavel1 = [];
   List<String> incalculavel2 = [];
+  String inputCompleto = input;
   int contador = 0;
   String temParenteses = parenteses(input);
   if (temParenteses != "-1") {
@@ -153,36 +160,32 @@ calcularTudo(String input) {
 
   if (input.indexOf("=") != -1) {
     print(input);
-    temParenteses = parenteses(input);
-    if (temParenteses != "-1") {
-      String parentesesResolvido = dividirPartes(temParenteses);
-      //input = input.replaceAll("(" + temParenteses + ")", parentesesResolvido);
 
-    }
     Lados retorno = separarLados(input);
     String esquerda = retorno.esquerdaGet;
     String direita = retorno.direitaGet;
 
     int indicePrioridade = encontrarIndicePrioridade(esquerda);
-    Calculo CalculoPrioritario =
-        pegarPartePrioritaria(esquerda, indicePrioridade);
+    // lado esquerdo
+    if (indicePrioridade != -1) {
+      Calculo CalculoPrioritario =
+          pegarPartePrioritaria(esquerda, indicePrioridade);
+      esquerda = calcularParteT(esquerda, CalculoPrioritario);
+      print(" 169 Lado esquerdo = " + esquerda);
+    }
 
     int indicePrioridade2 = encontrarIndicePrioridade(direita);
-    Calculo CalculoPrioritario2 =
-        pegarPartePrioritaria(direita, indicePrioridade2);
-
+    if (indicePrioridade2 != -1) {
+      Calculo CalculoPrioritario2 =
+          pegarPartePrioritaria(direita, indicePrioridade2);
+      direita = calcularParteT(direita, CalculoPrioritario2);
+      print("Lado direito = " + direita);
+    }
     print("163 retorno esquerda" + esquerda);
     print("retorno direita" + direita);
     incalculavel1 = retorno.incalculavelEGet;
     incalculavel2 = retorno.incalculavelDGet;
-    while (!isNumeric(esquerda)) {
-      esquerda = calcularParteT(esquerda, CalculoPrioritario);
-      print(" 169 Lado esquerdo = " + esquerda);
-    }
-    while (!isNumeric(direita)) {
-      direita = calcularParteT(direita, CalculoPrioritario2);
-      print("Lado direito = " + direita);
-    }
+
     input = esquerda + "=" + direita;
     print(input);
     return input;
@@ -194,6 +197,9 @@ calcularTudo(String input) {
         pegarPartePrioritaria(input, indicePrioridade1);
 
     input = calcularParteT(input, CalculoPrioritario1);
+  }
+  if (temParenteses != "-1") {
+    input = inputCompleto.replaceAll("(" + temParenteses + ")", input);
   }
   return input;
 }

@@ -16,6 +16,13 @@ class Memory {
   }
 
   void applyCommand(String command) {
+    if (command == "0") {
+      _value += "0";
+      return;
+    } else if (command == ".") {
+      _value += command;
+      return;
+    }
     if (command == "Before Calculate") {
       _value = _antesDoCalculo;
       return;
