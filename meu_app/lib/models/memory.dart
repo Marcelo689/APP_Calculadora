@@ -32,8 +32,10 @@ class Memory {
         if (!(_value == calcularTudo(_value))) {
           _antesDoCalculo = _value;
         }
+
         _value = calcularTudo(_value);
       } catch (erro) {
+        print(erro);
         Fluttertoast.showToast(
           msg: "Invalid Calculation",
           toastLength: Toast.LENGTH_SHORT,
@@ -78,7 +80,14 @@ class Memory {
         _value += command;
         return;
       }
-      return;
+      if (command == "x" && isNumeric(_value[_value.length - 1])) {
+        _value += command;
+        return;
+      }
+      if (command == "=" && _value[_value.length - 1] == "x") {
+        _value += command;
+        return;
+      }
     }
     _value += command;
   }

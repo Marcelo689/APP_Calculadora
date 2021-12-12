@@ -154,6 +154,7 @@ calcularTudo(String input) {
   String inputCompleto = input;
   int contador = 0;
   String temParenteses = parenteses(input);
+  int flag = 0;
   if (temParenteses != "-1") {
     input = temParenteses;
   }
@@ -167,11 +168,24 @@ calcularTudo(String input) {
 
     int indicePrioridade = encontrarIndicePrioridade(esquerda);
     // lado esquerdo
+    print(" 171 indice prioritario = " + indicePrioridade.toString());
     if (indicePrioridade != -1) {
       Calculo CalculoPrioritario =
           pegarPartePrioritaria(esquerda, indicePrioridade);
       esquerda = calcularParteT(esquerda, CalculoPrioritario);
       print(" 169 Lado esquerdo = " + esquerda);
+    } else if (esquerda.contains("x") && isNumeric(direita)) {
+      if (direita.contains("x")) {
+      } else {
+        direita = (double.parse(direita) /
+                (double.parse(esquerda.substring(0, esquerda.length - 1))))
+            .toString();
+        esquerda = "x";
+        flag = 1;
+        input = esquerda + "=" + direita;
+        print(input);
+        return input;
+      }
     }
 
     int indicePrioridade2 = encontrarIndicePrioridade(direita);
@@ -232,18 +246,6 @@ parenteses(String input) {
 
     String resultado = calcularParteT(input, listInputs);
     print("Resultado do parenteses =" + resultado);
-    //input = input.replaceAll(num1 + sinal + num2, resultado);
-    //print("Resultado depois do replace =" + input);
-    // while (encontrarIndicePrioridade(input) != -1) {
-    //   indicePrioridade = encontrarIndicePrioridade(input);
-    //   listInputs = pegarPartePrioritaria(input, indicePrioridade);
-    //   num1 = listInputs.num1Get;
-    //   num2 = listInputs.num2Get;
-    //   sinal = listInputs.sinal;
-
-    //   resultado = calcularParteT(input, listInputs);
-    //   //input = input.replaceAll(num1 + sinal + num2, resultado);
-    // }
     return input;
   } else {
     return "-1";
@@ -318,8 +320,9 @@ calcularParteT(String input, Calculo listInputs) {
   String input1 = listInputs.num1Get.toString();
   String input2 = listInputs.num2Get.toString();
   String sinal = listInputs.sinal;
+
+  String incalculavel = "";
   print(listInputs.num1Get);
-  print("281 input1 =" + input1);
   if (input1 == "") {
     print("Está vazio");
     stringResultado = stringCompleta.replaceAll(stringCompleta, input);
@@ -335,8 +338,10 @@ calcularParteT(String input, Calculo listInputs) {
   if (input1[input1.length - 1] == "x" && input2[input2.length - 1] == "x") {
     numOfX = 2;
   } else if (input1[input1.length - 1] == "x") {
+    incalculavel = input1;
     numOfX = 1;
   } else if (input2[input2.length - 1] == "x") {
+    incalculavel = input2;
     numOfX = 1;
   } else {
     numOfX = 0;
@@ -346,151 +351,83 @@ calcularParteT(String input, Calculo listInputs) {
   List<String> numerosPower = [];
 
   /// potencia
-  if (input1.indexOf("^") != -1) {
-    numerosPower = input1.split("^");
 
-    resultado = pow(double.parse(numerosPower[0].toString()),
-        double.parse(numerosPower[1])) as double;
-    resultados.add(resultado);
-    stringCompleta.replaceAll(input1, resultado.toString());
-    num1 = resultado;
-  }
   numerosPower = [];
-  if (input2.indexOf("^") != -1) {
-    numerosPower = input2.split("^");
+  if (incalculavel != "") {}
+  switch (sinal) {
+    case "^":
+      resultado = pow(num1, num2) as double;
+      print("331 resultado= " + resultado.toString());
+      switch (numOfX) {
+        case 0:
+          break;
+        case 1:
+          resultadoX = resultado.toString() + "x";
+          break;
+        case 2:
+          resultadoX = resultado.toString() + "x^2";
+          break;
+      }
+      break;
+    case "X":
+      resultado = num1 * num2;
+      print("331 resultado= " + resultado.toString());
+      switch (numOfX) {
+        case 0:
+          break;
+        case 1:
+          resultadoX = resultado.toString() + "x";
+          break;
+        case 2:
+          resultadoX = resultado.toString() + "x^2";
+          break;
+      }
+      break;
 
-    resultado = pow(double.parse(numerosPower[0].toString()),
-        double.parse(numerosPower[1])) as double;
-    resultados.add(resultado);
-    stringCompleta.replaceAll(input2, resultado.toString());
-    num2 = resultado;
-    // valores da potencia 1 e 2
-  }
-
-  if (input2.indexOf("^") == -1 && input1.indexOf("^") == -1) {
-    switch (sinal) {
-      case "X":
-        resultado = num1 * num2;
-        print("331 resultado= " + resultado.toString());
-        switch (numOfX) {
-          case 0:
-            break;
-          case 1:
-            resultadoX = resultado.toString() + "x";
-            break;
-          case 2:
-            resultadoX = resultado.toString() + "x^2";
-            break;
-        }
-        break;
-
-      case "÷":
-        resultado = num1 / num2;
-        switch (numOfX) {
-          case 0:
-            break;
-          case 1:
-            resultadoX = resultado.toString() + "x";
-            break;
-          case 2:
-            resultadoX = resultado.toString() + "x^2";
-            break;
-        }
-        break;
-      case "-":
-        switch (numOfX) {
-          case 0:
-            resultado = num1 - num2;
-            break;
-          case 1:
-            resultadoX = num1.toString() + sinal + num2.toString();
-            break;
-          case 2:
-            resultado = num1 - num2;
-            resultadoX = resultado.toString() + "x";
-            break;
-        }
-        break;
-      case "+":
-        switch (numOfX) {
-          case 0:
-            resultado = num1 + num2;
-            break;
-          case 1:
-            resultadoX = num1.toString() + sinal + num2.toString();
-            break;
-          case 2:
-            resultado = num1 + num2;
-            resultadoX = resultado.toString() + "x";
-            break;
-        }
-        break;
-      case "√":
-        resultado = sqrt(num1);
-        break;
-    }
-  } else {
-    switch (sinal) {
-      case "X":
-        resultado = num1 * num2;
-        print("331 resultado= " + resultado.toString());
-        switch (numOfX) {
-          case 0:
-            break;
-          case 1:
-            resultadoX = resultado.toString() + "x";
-            break;
-          case 2:
-            resultadoX = resultado.toString() + "x^2";
-            break;
-        }
-        break;
-
-      case "÷":
-        resultado = num1 / num2;
-        switch (numOfX) {
-          case 0:
-            break;
-          case 1:
-            resultadoX = resultado.toString() + "x";
-            break;
-          case 2:
-            resultadoX = resultado.toString() + "x^2";
-            break;
-        }
-        break;
-      case "-":
-        switch (numOfX) {
-          case 0:
-            resultado = num1 - num2;
-            break;
-          case 1:
-            resultadoX = num1.toString() + sinal + num2.toString();
-            break;
-          case 2:
-            resultado = num1 - num2;
-            resultadoX = resultado.toString() + "x";
-            break;
-        }
-        break;
-      case "+":
-        switch (numOfX) {
-          case 0:
-            resultado = num1 + num2;
-            break;
-          case 1:
-            resultadoX = num1.toString() + sinal + num2.toString();
-            break;
-          case 2:
-            resultado = num1 + num2;
-            resultadoX = resultado.toString() + "x";
-            break;
-        }
-        break;
-      case "√":
-        resultado = sqrt(num1);
-        break;
-    }
+    case "÷":
+      resultado = num1 / num2;
+      switch (numOfX) {
+        case 0:
+          break;
+        case 1:
+          resultadoX = resultado.toString() + "x";
+          break;
+        case 2:
+          resultadoX = resultado.toString() + "x^2";
+          break;
+      }
+      break;
+    case "-":
+      switch (numOfX) {
+        case 0:
+          resultado = num1 - num2;
+          break;
+        case 1:
+          resultadoX = num1.toString() + sinal + num2.toString();
+          break;
+        case 2:
+          resultado = num1 - num2;
+          resultadoX = resultado.toString() + "x";
+          break;
+      }
+      break;
+    case "+":
+      switch (numOfX) {
+        case 0:
+          resultado = num1 + num2;
+          break;
+        case 1:
+          resultadoX = num1.toString() + sinal + num2.toString();
+          break;
+        case 2:
+          resultado = num1 + num2;
+          resultadoX = resultado.toString() + "x";
+          break;
+      }
+      break;
+    case "√":
+      resultado = sqrt(num1);
+      break;
   }
 
   switch (numOfX) {
@@ -517,153 +454,3 @@ calcularParteT(String input, Calculo listInputs) {
   }
   return stringResultado;
 }
-
-// calcularParte(String input) {
-//   String stringCompleta = input;
-//   String stringResultado = "";
-//   int numOfX = 0;
-//   print(input);
-//   print("\n");
-//   if (input.contains("(")) {
-//     input = parenteses(input);
-//   }
-//   print(input);
-//   print("\n");
-//   Calculo listInputs = (dividirPartes(input));
-//   String input1 = listInputs.num1Get.toString();
-//   String input2 = listInputs.num2Get.toString();
-//   String sinal = listInputs.sinal;
-
-//   if (input1 == "") {
-//     print("Está vazio");
-//     stringResultado = stringCompleta.replaceAll(stringCompleta, input);
-//     return stringResultado;
-//   }
-//   double num1 = double.parse(listInputs.num1Get);
-//   double num2 = double.parse(listInputs.num2Get);
-//   print("num1=" + num1.toString() + "\n num2=" + num2.toString());
-
-//   print(sinal);
-//   String stringCalculada = input1 + sinal + input2;
-//   String resultadoX = "";
-//   if (input1[input1.length - 1] == "x" && input2[input2.length - 1] == "x") {
-//     numOfX = 2;
-//   } else if (input1[input1.length - 1] == "x") {
-//     numOfX = 1;
-//   } else if (input2[input2.length - 1] == "x") {
-//     numOfX = 1;
-//   }
-//   List<double> resultados = [];
-//   double? resultado = 0;
-//   List<String> numerosPower = [];
-
-//   /// potencia
-//   if (input1.indexOf("^") != -1) {
-//     numerosPower = input1.split("^");
-
-//     resultado = pow(double.parse(numerosPower[0].toString()),
-//         double.parse(numerosPower[1])) as double;
-//     resultados.add(resultado);
-//     stringCompleta.replaceAll(input1, resultado.toString());
-//     num1 = resultado;
-//   }
-//   numerosPower = [];
-//   if (input2.indexOf("^") != -1) {
-//     numerosPower = input2.split("^");
-
-//     resultado = pow(double.parse(numerosPower[0].toString()),
-//         double.parse(numerosPower[1])) as double;
-//     resultados.add(resultado);
-//     stringCompleta.replaceAll(input2, resultado.toString());
-//     num2 = resultado;
-//     // valores da potencia 1 e 2
-//   }
-
-//   if (input2.indexOf("^") == -1 && input1.indexOf("^") == -1) {
-//     switch (sinal) {
-//       case "X":
-//         resultado = num1 * num2;
-//         print("resultado= " + resultado.toString());
-//         switch (numOfX) {
-//           case 0:
-//             break;
-//           case 1:
-//             resultadoX = resultado.toString() + "x";
-//             break;
-//           case 2:
-//             resultadoX = resultado.toString() + "x^2";
-//             break;
-//         }
-//         break;
-
-//       case "÷":
-//         resultado = num1 / num2;
-//         switch (numOfX) {
-//           case 0:
-//             break;
-//           case 1:
-//             resultadoX = resultado.toString() + "x";
-//             break;
-//           case 2:
-//             resultadoX = resultado.toString() + "x^2";
-//             break;
-//         }
-//         break;
-//       case "-":
-//         switch (numOfX) {
-//           case 0:
-//             resultado = num1 - num2;
-//             break;
-//           case 1:
-//             resultadoX = num1.toString() + sinal + num2.toString();
-//             break;
-//           case 2:
-//             resultado = num1 - num2;
-//             resultadoX = resultado.toString() + "x";
-//             break;
-//         }
-//         break;
-//       case "+":
-//         switch (numOfX) {
-//           case 0:
-//             resultado = num1 + num2;
-//             break;
-//           case 1:
-//             resultadoX = num1.toString() + sinal + num2.toString();
-//             break;
-//           case 2:
-//             resultado = num1 + num2;
-//             resultadoX = resultado.toString() + "x";
-//             break;
-//         }
-//         break;
-//       case "√":
-//         resultado = sqrt(num1);
-//         break;
-//     }
-//   }
-
-//   switch (numOfX) {
-//     case 0:
-//       break;
-//     case 1:
-//       resultadoX = resultado.toString() + "x";
-//       break;
-//     case 2:
-//       resultadoX = resultado.toString() + "x^2";
-//       break;
-//   }
-//   print("Calcular Parte \n Resultado=" +
-//       resultado.toString() +
-//       "\n resultadoX=" +
-//       resultadoX);
-//   if (resultadoX != "") {
-//     stringResultado = stringCompleta.replaceAll(stringCalculada, resultadoX);
-//   } else {
-//     print(stringCompleta);
-//     stringResultado =
-//         stringCompleta.replaceAll(stringCalculada, resultado.toString());
-//     print(stringCompleta);
-//   }
-//   return stringResultado;
-// }
