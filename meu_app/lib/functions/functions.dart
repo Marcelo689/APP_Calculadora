@@ -213,7 +213,23 @@ pegarPartePrioritaria(String input, int indice) {
   list.StringCalculada = StringCalculada;
   return list;
 }
+addSinal(String input){
+  if(input[0] == "+" || input[0] == "-"){
+    return input;
+  }
+  String saida = "+"+input;
+  return saida;
+}
+removeSinal(String input){
+  String saida = "";
+  if(input[0] == "+" || input[0] == "-"){
+    saida =removeOneLetter(input, 0);
+    return saida;
+  }else{
+    return input;
+  }
 
+}
 calcularTudo(String input) {
   List<String> incalculavel1 = [];
   List<String> incalculavel2 = [];
@@ -237,54 +253,72 @@ calcularTudo(String input) {
     String apenasNumerosCalculados="";
     int indicePrioridade = -1;
     String numeroComX = "";
+    Calculo CalculoPrioritario= new Calculo("", "", "");
     //futuramente while
     while(existNumeroComX(esquerda) != false){
       numeroComX = existNumeroComX(esquerda);
+      print("numero com X 243 :   "+numeroComX);
       incalculavel1.add(numeroComX);
+      numeroComX = addSinal(numeroComX);
       if(esquerda.indexOf(numeroComX) != -1 ){
         esquerda = esquerda.replaceAll(numeroComX, "");
+        print("encontrou sinal do x");
       }else{
         numeroComX = removeOneLetter(numeroComX, 0);
         esquerda = esquerda.replaceAll(numeroComX, "");
       }
+      print("Esquerda depois : "+esquerda);
+      if(esquerda.isEmpty){
+        break;
+      }
     }
-    indicePrioridade = encontrarIndicePrioridade(esquerda);
-    print("indice erro = "+indicePrioridade.toString());
+    if(esquerda.isNotEmpty) {
+      indicePrioridade = encontrarIndicePrioridade(esquerda);
+      print("indice erro = " + indicePrioridade.toString());
 
-    if(indicePrioridade != -1){
-      Calculo CalculoPrioritario = pegarPartePrioritaria(esquerda, indicePrioridade);
-      tempCalculo = calcularParteT(esquerda, CalculoPrioritario);
-      esquerda = "";
-      print("Resultado do temp"+ tempCalculo);
-      while(incalculavel1.isNotEmpty){
-        esquerda += incalculavel1.first;
-        incalculavel1.removeAt(0);
+      if (indicePrioridade != -1) {
+        CalculoPrioritario = pegarPartePrioritaria(
+            esquerda, indicePrioridade);
+        tempCalculo = calcularParteT(esquerda, CalculoPrioritario);
+        esquerda = "";
+        tempCalculo = addSinal(tempCalculo);
+        print("Resultado do temp  " + tempCalculo);
+        while (incalculavel1.isNotEmpty) {
+          esquerda += incalculavel1.first;
+          incalculavel1.removeAt(0);
+        }
+        print("String calculada " + esquerda);
+        esquerda += tempCalculo;
+      } else {
+        print("sinal " + esquerda);
+        String sinal = esquerda[0];
+        if(sinal == "+"){
+          sinal = "-";
+        }else{
+          sinal  = "+";
+        }
+        direita += sinal+(double.parse(esquerda) * -1).toString();
+        esquerda = esquerda.replaceAll(esquerda, "");
+        print("esquerda 269  " + esquerda);
+        print("lado direito 288 :  "+direita);
+        while (incalculavel1.isNotEmpty) {
+          esquerda += incalculavel1.first;
+          incalculavel1.removeAt(0);
+        }
       }
-      print("String calculada "+esquerda);
-      esquerda = esquerda.replaceAll(esquerda[0]+CalculoPrioritario.StringCalculada, "");
-      esquerda += tempCalculo;
-    }else{
-      String sinalTroca = esquerda[0];
-      print("sinal "+esquerda);
-      esquerda = removeOneLetter(esquerda, 0);
-      switch(sinalTroca){
-        case "+":
-          direita += (double.parse(esquerda) *-1).toString();
-          break;
-      }
-      esquerda = esquerda.replaceAll(esquerda, "");
-      print("esquerda 269  "+esquerda);
-      while(incalculavel1.isNotEmpty){
-        esquerda += incalculavel1.first;
-        incalculavel1.removeAt(0);
-      }
-
     }
-
-    // Calculou a esquerda
-    // lado esquerdo
-    print(" 171 restante da esquerda = " + esquerda);
-
+    while(incalculavel1.isNotEmpty){
+      esquerda += incalculavel1.first;
+      incalculavel1.removeAt(0);
+    }
+    indicePrioridade =encontrarIndicePrioridade(esquerda);
+    if(indicePrioridade != -1) {
+      CalculoPrioritario = pegarPartePrioritaria(esquerda, indicePrioridade);
+      esquerda = calcularParteT(esquerda, CalculoPrioritario);
+      // Calculou a esquerda
+      // lado esquerdo
+      print(" 171 restante da esquerda = " + esquerda);
+    }
     int indicePrioridade2 = encontrarIndicePrioridade(direita);
     if (indicePrioridade2 != -1) {
       Calculo CalculoPrioritario2 =
@@ -322,13 +356,16 @@ calcularTudo(String input) {
         isNumeric(esquerda.substring(0, esquerda.length - 1))) {
       if (direita.contains("x")) {
       } else {
-        direita = (double.parse(direita) /
-                (double.parse(esquerda.substring(0, esquerda.length - 1))))
-            .toString();
-        esquerda = "x";
-        input = esquerda + "=" + direita;
-        print(input);
-        return input;
+        print("esquerda (direita)  "+esquerda);
+        if (!esquerda.contains("x^2")) {
+          direita = (double.parse(direita) /
+              (double.parse(esquerda.substring(0, esquerda.length - 1))))
+              .toString();
+          esquerda = "x";
+          input = esquerda + "=" + direita;
+          print(input);
+          return input;
+        }
       }
     }
 
@@ -463,11 +500,11 @@ calcularParteT(String input, Calculo listInputs) {
     stringResultado = stringCompleta.replaceAll(stringCompleta, input);
     return stringResultado;
   }
-  if (!isNumeric(input1) == false) {
+  if (isNumeric(input1)) {
     num1 = double.parse(listInputs.num1Get);
   }
 
-  if (!isNumeric(input2) == false) {
+  if (isNumeric(input2)) {
     num2 = double.parse(listInputs.num2Get);
   }
   print("289 num1=" + num1.toString() + "\n num2=" + num2.toString());
@@ -481,6 +518,9 @@ calcularParteT(String input, Calculo listInputs) {
         "num1 input1 and input 2 = " + input1.substring(0, input1.length - 1));
     num1 = double.parse(input1.substring(0, input1.length - 1));
     num2 = double.parse(input2.substring(0, input2.length - 1));
+
+    print("numero um  "+num1.toString());
+    print("numero dois  "+num2.toString());
   } else if (input1[input1.length - 1] == "x") {
     print("num1 input1 = " + input1.substring(0, input1.length - 1));
     num1 = double.parse(input1.substring(0, input1.length - 1));
@@ -507,10 +547,10 @@ calcularParteT(String input, Calculo listInputs) {
         case 0:
           break;
         case 1:
-          resultadoX = resultado.toString() + "x";
+          resultadoX = resultado.toString() + "x^"+num2.toString();
           break;
         case 2:
-          resultadoX = resultado.toString() + "x";
+          resultadoX = resultado.toString() + "x^"+num2.toString();
           break;
         case 3:
           resultadoX = resultado.toString() + "x^2";
@@ -554,13 +594,17 @@ calcularParteT(String input, Calculo listInputs) {
     case "-":
       switch (numOfX) {
         case 0:
-          resultado = num1 - num2;
+          num2 = double.parse(removeSinal(num2.toString()));
+          resultado = num1 -num2;
+          print("resultado subtração   " +resultado.toString() );
           break;
         case 1:
-          resultadoX = resultado.toString() + "x";
+          return input;
+          //incalculavel
           break;
         case 2:
-          resultadoX = resultado.toString() + "x";
+          return input;
+          //incalculavel
           break;
         case 3:
           resultadoX = resultado.toString() + "x^2";
@@ -573,15 +617,15 @@ calcularParteT(String input, Calculo listInputs) {
           resultado = num1 + num2;
           break;
         case 1:
-          resultadoX = num1.toString() + "x" + num2.toString();
-          Incalculavel incalculavel = new Incalculavel(resultadoX, input1);
-          return incalculavel;
-          break;
+          return input;
+          // incalculavel
         case 2:
-          resultadoX = num1.toString() + "x" + num2.toString();
-          break;
+          return input;
+          // incalculavel
+
         case 3:
-          resultadoX = resultado.toString() + "x^2";
+          resultado = num1 + num2;
+          resultadoX = resultado.toString() + "x";
           break;
       }
       break;
@@ -590,19 +634,6 @@ calcularParteT(String input, Calculo listInputs) {
       break;
   }
 
-  switch (numOfX) {
-    case 0:
-      break;
-    case 1:
-      resultadoX = resultado.toString() + "x";
-      break;
-    case 2:
-      resultadoX = resultado.toString() + "x";
-      break;
-    case 3:
-      resultadoX = resultado.toString() + "x^2";
-      break;
-  }
   print("Calcular Parte \n Resultado=" +
       resultado.toString() +
       "\n resultadoX=" +
