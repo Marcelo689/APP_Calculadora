@@ -172,6 +172,7 @@ pegarParteComX(String input, int indice) {
   }else{
      sinal = "+";
   }
+
   String saida = sinal +ladoEsquerdo + "x" + ladoDireito;
   print("saida do conteudo x = "+saida);
   return saida;
@@ -279,6 +280,19 @@ calcularTudo(String input) {
       if (indicePrioridade != -1) {
         CalculoPrioritario = pegarPartePrioritaria(
             esquerda, indicePrioridade);
+        if(CalculoPrioritario.sinal == "X" && CalculoPrioritario.num1 == ""){
+
+          esquerda ="";
+          while (incalculavel1.isNotEmpty) {
+            esquerda += incalculavel1.first;
+            incalculavel1.removeAt(0);
+          }
+          esquerda+= CalculoPrioritario.sinal+CalculoPrioritario.num2;
+          print("Esquerda 292  "+esquerda);
+        }
+
+        CalculoPrioritario = pegarPartePrioritaria(
+            esquerda, indicePrioridade);
         tempCalculo = calcularParteT(esquerda, CalculoPrioritario);
         esquerda = "";
         tempCalculo = addSinal(tempCalculo);
@@ -311,6 +325,9 @@ calcularTudo(String input) {
       esquerda += incalculavel1.first;
       incalculavel1.removeAt(0);
     }
+
+    print("esquerda finalizada "+esquerda);
+
     indicePrioridade =encontrarIndicePrioridade(esquerda);
     if(indicePrioridade != -1) {
       CalculoPrioritario = pegarPartePrioritaria(esquerda, indicePrioridade);
