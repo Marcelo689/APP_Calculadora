@@ -143,21 +143,25 @@ encontrarIndicePrioridade(String input) {
 }
 
 pegarParteComX(String input, int indice) {
+  List<String> operations = ["+", "-", "X", "÷", "^"];
   String ladoEsquerdo = "";
   String sinal = "";
+  print("pegarParteComX input :" +input);
   for (int i = indice - 1; i >= 0; i--) {
+    print("for pegarParte :"+input[i]);
     if (isNumeric(input[i]) || input[i] == "-" || input[i] == ".") {
-      if(i != 0) {
-        if (input[i - 1] == "-" && isNumeric(input[i])) {
-          break;
-        }
-      }
+
       ladoEsquerdo += input[i];
+      if(operations.contains(input[i])){
+        break;
+      }
+      print("lado esquerdo atual :"+ladoEsquerdo);
     } else {
       break;
     }
   }
   ladoEsquerdo = ladoEsquerdo.split('').reversed.join();
+  print("lado esquerdo do x pegarParte :"+ladoEsquerdo);
   String ladoDireito = "";
   for (int i = indice + 1; i <= input.length - 1; i++) {
     if (isNumeric(input[i]) || input[i] == "^" || input[i] == ".") {
@@ -166,14 +170,10 @@ pegarParteComX(String input, int indice) {
       break;
     }
   }
-  print("primeiro indice "+input[0]);
-  if(!isNumeric(input[0])){
-     sinal = input[0];
-  }else{
-     sinal = "+";
-  }
+  print("primeiro indice "+ladoEsquerdo[0]);
+  ladoEsquerdo = addSinal(ladoEsquerdo);
 
-  String saida = sinal +ladoEsquerdo + "x" + ladoDireito;
+  String saida = ladoEsquerdo + "x" + ladoDireito;
   print("saida do conteudo x = "+saida);
   return saida;
 }
@@ -183,33 +183,43 @@ pegarPartePrioritaria(String input, int indice) {
   print("input=" + input);
   print("119 indice=" + indice.toString());
   String ladoEsquerdo = "";
-  for (int i = indice - 1; i >= 0; i--) {
-    if (isNumeric(input[i]) ||
-        input[i] == "-" ||
-        input[i] == "x" ||
-        input[i] == ".") {
-      ladoEsquerdo += input[i];
-    } else {
-      break;
-    }
-  }
-  ladoEsquerdo = ladoEsquerdo.split('').reversed.join();
   String ladoDireito = "";
-  for (int i = indice + 1; i <= input.length - 1; i++) {
-    if (isNumeric(input[i]) ||
-        input[i] == "-" ||
-        input[i] == "x" ||
-        input[i] == ".") {
-      ladoDireito += input[i];
-    } else {
-      break;
-    }
-  }
   String sinal = input[indice];
+  String StringCalculada="";
+  if(sinal == "√"){
+    ladoEsquerdo = input.substring(indice+1,input.length);
+    StringCalculada = sinal +ladoEsquerdo;
+  }else {
+    for (int i = indice - 1; i >= 0; i--) {
+      if (isNumeric(input[i]) ||
+          input[i] == "-" ||
+          input[i] == "x" ||
+          input[i] == ".") {
+        ladoEsquerdo += input[i];
+      } else {
+        break;
+      }
+    }
+    ladoEsquerdo = ladoEsquerdo
+        .split('')
+        .reversed
+        .join();
+    for (int i = indice + 1; i <= input.length - 1; i++) {
+      if (isNumeric(input[i]) ||
+          input[i] == "-" ||
+          input[i] == "x" ||
+          input[i] == ".") {
+        ladoDireito += input[i];
+      } else {
+        break;
+      }
+    }
+
+    StringCalculada= ladoEsquerdo+sinal+ladoDireito;
+  }
   print(" 133 lado esquerdo=" + ladoEsquerdo);
   print("lado direito =" + ladoDireito);
   print(" 135 sinal = " + sinal);
-  String StringCalculada= ladoEsquerdo+sinal+ladoDireito;
   Calculo list = new Calculo(ladoEsquerdo, ladoDireito, sinal);
   list.StringCalculada = StringCalculada;
   return list;
@@ -231,12 +241,23 @@ removeSinal(String input){
   }
 
 }
+alterarSinal(String entrada){
+  String sinal = "";
+  entrada = addSinal(entrada);
+  sinal = entrada[0];
+  if(sinal == "+")
+  {
+    sinal = "-";
+  }else{
+    sinal = "+";
+  }
+
+  return sinal+removeOneLetter(entrada, 0);
+
+}
 calcularTudo(String input) {
-  List<String> incalculavel1 = [];
-  List<String> incalculavel2 = [];
-  List<String> operacoes = ["-", "X", "+", "÷"];
+  List<String> incalculaveis = [];
   String inputCompleto = input;
-  int contador = 0;
   String temParenteses = parenteses(input);
   String tempNum = "";
   double tempDouble = 0;
@@ -256,10 +277,28 @@ calcularTudo(String input) {
     String numeroComX = "";
     Calculo CalculoPrioritario= new Calculo("", "", "");
     //futuramente while
+    while(existNumeroComX(direita) != false){
+      numeroComX = existNumeroComX(direita);
+      print("lado direito numero com x :   "+numeroComX);
+      print("numero com x depois de alterar sinal :"+alterarSinal(numeroComX));
+      incalculaveis.add(alterarSinal(numeroComX));
+      numeroComX = addSinal(numeroComX);
+      if(direita.indexOf(numeroComX) != -1 ){
+        direita = direita.replaceAll(numeroComX, "");
+        print("depois do replace lado direito x :"+direita);
+      }else{
+        numeroComX = removeOneLetter(numeroComX, 0);
+        direita = direita.replaceAll(numeroComX, "");
+      }
+      print("Esquerda depois : "+direita);
+      if(esquerda.isEmpty){
+        break;
+      }
+    }
     while(existNumeroComX(esquerda) != false){
       numeroComX = existNumeroComX(esquerda);
       print("numero com X 243 :   "+numeroComX);
-      incalculavel1.add(numeroComX);
+      incalculaveis.add(numeroComX);
       numeroComX = addSinal(numeroComX);
       if(esquerda.indexOf(numeroComX) != -1 ){
         esquerda = esquerda.replaceAll(numeroComX, "");
@@ -283,9 +322,9 @@ calcularTudo(String input) {
         if(CalculoPrioritario.sinal == "X" && CalculoPrioritario.num1 == ""){
 
           esquerda ="";
-          while (incalculavel1.isNotEmpty) {
-            esquerda += incalculavel1.first;
-            incalculavel1.removeAt(0);
+          while (incalculaveis.isNotEmpty) {
+            esquerda += incalculaveis.first;
+            incalculaveis.removeAt(0);
           }
           esquerda+= CalculoPrioritario.sinal+CalculoPrioritario.num2;
           print("Esquerda 292  "+esquerda);
@@ -297,9 +336,9 @@ calcularTudo(String input) {
         esquerda = "";
         tempCalculo = addSinal(tempCalculo);
         print("Resultado do temp  " + tempCalculo);
-        while (incalculavel1.isNotEmpty) {
-          esquerda += incalculavel1.first;
-          incalculavel1.removeAt(0);
+        while (incalculaveis.isNotEmpty) {
+          esquerda += incalculaveis.first;
+          incalculaveis.removeAt(0);
         }
         print("String calculada " + esquerda);
         esquerda += tempCalculo;
@@ -315,15 +354,15 @@ calcularTudo(String input) {
         esquerda = esquerda.replaceAll(esquerda, "");
         print("esquerda 269  " + esquerda);
         print("lado direito 288 :  "+direita);
-        while (incalculavel1.isNotEmpty) {
-          esquerda += incalculavel1.first;
-          incalculavel1.removeAt(0);
+        while (incalculaveis.isNotEmpty) {
+            esquerda += addSinal(incalculaveis.first);
+          incalculaveis.removeAt(0);
         }
       }
     }
-    while(incalculavel1.isNotEmpty){
-      esquerda += incalculavel1.first;
-      incalculavel1.removeAt(0);
+    while(incalculaveis.isNotEmpty){
+      esquerda += addSinal(incalculaveis.first);
+      incalculaveis.removeAt(0);
     }
 
     print("esquerda finalizada "+esquerda);
@@ -390,14 +429,14 @@ calcularTudo(String input) {
     print("235 tela " + input);
     return input;
   }
-  print("input calcular tudo =" + input);
-  while (!isNumeric(input)) {
-    int indicePrioridade1 = encontrarIndicePrioridade(input);
-    Calculo CalculoPrioritario1 =
-        pegarPartePrioritaria(input, indicePrioridade1);
+    print("input calcular tudo =" + input);
+    while (!isNumeric(input)) {
+      int indicePrioridade1 = encontrarIndicePrioridade(input);
+      Calculo CalculoPrioritario1 =
+          pegarPartePrioritaria(input, indicePrioridade1);
 
-    input = calcularParteT(input, CalculoPrioritario1);
-  }
+      input = calcularParteT(input, CalculoPrioritario1);
+    }
   if (temParenteses != "-1") {
     input = inputCompleto.replaceAll("(" + temParenteses + ")", input);
   }
@@ -497,13 +536,13 @@ dividirPartes(String input) {
 calcularParteT(String input, Calculo listInputs) {
   String stringCompleta = input;
   String stringResultado = "";
+  String stringCalculada= "";
   int numOfX = 0;
   print(input);
   print("\n");
 
   print(input);
   print("\n");
-  //Calculo listInputs = (dividirPartes(input));
   String input1 = listInputs.num1Get.toString();
   String input2 = listInputs.num2Get.toString();
   String sinal = listInputs.sinal;
@@ -512,11 +551,15 @@ calcularParteT(String input, Calculo listInputs) {
   String incalculavel = "";
   print("calcular tudo \n input1 = " + input1);
   print(listInputs.num1Get);
+  if(sinal == "√"){
+    stringCalculada = sinal + input1;
+  }else
   if (input1 == "" || input2 == "") {
     print("Está vazio");
     stringResultado = stringCompleta.replaceAll(stringCompleta, input);
     return stringResultado;
   }
+
   if (isNumeric(input1)) {
     num1 = double.parse(listInputs.num1Get);
   }
@@ -527,27 +570,29 @@ calcularParteT(String input, Calculo listInputs) {
   print("289 num1=" + num1.toString() + "\n num2=" + num2.toString());
 
   print(sinal);
-  String stringCalculada = input1 + sinal + input2;
   String resultadoX = "";
-  if (input1[input1.length - 1] == "x" && input2[input2.length - 1] == "x") {
-    numOfX = 3;
-    print(
-        "num1 input1 and input 2 = " + input1.substring(0, input1.length - 1));
-    num1 = double.parse(input1.substring(0, input1.length - 1));
-    num2 = double.parse(input2.substring(0, input2.length - 1));
+  if(!(sinal == "√")) {
+    if (input1[input1.length - 1] == "x" && input2[input2.length - 1] == "x") {
+      numOfX = 3;
+      print(
+          "num1 input1 and input 2 = " +
+              input1.substring(0, input1.length - 1));
+      num1 = double.parse(input1.substring(0, input1.length - 1));
+      num2 = double.parse(input2.substring(0, input2.length - 1));
 
-    print("numero um  "+num1.toString());
-    print("numero dois  "+num2.toString());
-  } else if (input1[input1.length - 1] == "x") {
-    print("num1 input1 = " + input1.substring(0, input1.length - 1));
-    num1 = double.parse(input1.substring(0, input1.length - 1));
-    numOfX = 1;
-  } else if (input2[input2.length - 1] == "x") {
-    print("num2 input2 = " + input2.substring(0, input2.length - 1));
-    num2 = double.parse(input2.substring(0, input2.length - 1));
-    numOfX = 2;
-  } else {
-    numOfX = 0;
+      print("numero um  " + num1.toString());
+      print("numero dois  " + num2.toString());
+    } else if (input1[input1.length - 1] == "x") {
+      print("num1 input1 = " + input1.substring(0, input1.length - 1));
+      num1 = double.parse(input1.substring(0, input1.length - 1));
+      numOfX = 1;
+    } else if (input2[input2.length - 1] == "x") {
+      print("num2 input2 = " + input2.substring(0, input2.length - 1));
+      num2 = double.parse(input2.substring(0, input2.length - 1));
+      numOfX = 2;
+    } else {
+      numOfX = 0;
+    }
   }
   List<double> resultados = [];
   double? resultado = 0;
@@ -650,7 +695,9 @@ calcularParteT(String input, Calculo listInputs) {
       resultado = sqrt(num1);
       break;
   }
-
+  if(!(sinal == "√")){
+    stringCalculada = input1 + sinal + input2;
+  }
   print("Calcular Parte \n Resultado=" +
       resultado.toString() +
       "\n resultadoX=" +

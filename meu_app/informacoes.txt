@@ -1,0 +1,1 @@
+1.Arrumando o calculo sem sinal de igual utilizando raizes;
