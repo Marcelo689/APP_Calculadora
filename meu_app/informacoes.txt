@@ -1,1 +1,3 @@
 1.Arrumando o calculo sem sinal de igual utilizando raizes;
+2.Começando a desenvolver a formula de baskara;
+3.Terminado funcao que recebe a parte prioritaria de x^2.

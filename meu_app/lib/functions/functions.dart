@@ -34,7 +34,24 @@ existNumeroComX(String input) {
     return false;
   }
 }
+IsBaskara(String input){
+  if(input.contains("x^2")){
+    input = input.replaceAll("x^2", "");
+    if(input.contains("x")){
+      return true;
+    }
+  }
+  return false;
 
+}
+resolverBaskara(String input){
+ pegarPartePrioritaria(input, indice)
+  if(IsBaskara(input)) {
+    double a = pegarParteComXQuadrado(input, indice);
+    double b = pegarParteComX(input, indice);
+    double c = pegarParteComXQuadrado(input, indice);
+  }
+}
 separarLados(String input) {
   List<String> incalculavel1 = [];
   List<String> incalculavel2 = [];
@@ -177,33 +194,26 @@ pegarParteComX(String input, int indice) {
   print("saida do conteudo x = "+saida);
   return saida;
 }
-
-//pra potencia
-pegarPartePrioritaria(String input, int indice) {
-  print("input=" + input);
-  print("119 indice=" + indice.toString());
+PegarEsquerdaSinal(String input, int indice) {
   String ladoEsquerdo = "";
-  String ladoDireito = "";
-  String sinal = input[indice];
-  String StringCalculada="";
-  if(sinal == "√"){
-    ladoEsquerdo = input.substring(indice+1,input.length);
-    StringCalculada = sinal +ladoEsquerdo;
-  }else {
-    for (int i = indice - 1; i >= 0; i--) {
-      if (isNumeric(input[i]) ||
-          input[i] == "-" ||
-          input[i] == "x" ||
-          input[i] == ".") {
-        ladoEsquerdo += input[i];
-      } else {
-        break;
-      }
+  for (int i = indice - 1; i >= 0; i--) {
+    if (isNumeric(input[i]) ||
+        input[i] == "-" ||
+        input[i] == "x" ||
+        input[i] == ".") {
+      ladoEsquerdo += input[i];
+    } else {
+      break;
     }
     ladoEsquerdo = ladoEsquerdo
         .split('')
         .reversed
         .join();
+    return ladoEsquerdo;
+  }
+}
+  PegarDireitoSinal(String input, int indice) {
+    String ladoDireito = "";
     for (int i = indice + 1; i <= input.length - 1; i++) {
       if (isNumeric(input[i]) ||
           input[i] == "-" ||
@@ -213,14 +223,42 @@ pegarPartePrioritaria(String input, int indice) {
       } else {
         break;
       }
+      return ladoDireito;
     }
+  }
 
-    StringCalculada= ladoEsquerdo+sinal+ladoDireito;
+//pra potencia
+pegarPartePrioritaria(String input, int indice) {
+  String ladoEsquerdo = "";
+  String ladoDireito = "";
+  String sinal = input[indice];
+  String StringCalculada="";
+  Calculo list= new Calculo(ladoEsquerdo, ladoDireito, sinal);
+  if(sinal == "√"){
+    ladoEsquerdo = input.substring(indice+1,input.length);
+    StringCalculada = sinal + ladoEsquerdo;
+  }else if(sinal == "^")
+  {
+    if(input[indice-1] == "x" && input[indice+1] == "2"){
+
+      ladoEsquerdo = PegarEsquerdaSinal(input, indice);
+      ladoDireito = PegarDireitoSinal(input, indice);
+      list = new Calculo(ladoEsquerdo, ladoDireito, sinal);
+      list.StringCalculada = (ladoEsquerdo + sinal + ladoDireito);
+      return list;
+    }
+  }
+  else
+  {
+    ladoEsquerdo = PegarEsquerdaSinal(input, indice);
+    ladoDireito = PegarDireitoSinal(input, indice);
+
+    StringCalculada= ladoEsquerdo + sinal + ladoDireito;
   }
   print(" 133 lado esquerdo=" + ladoEsquerdo);
   print("lado direito =" + ladoDireito);
   print(" 135 sinal = " + sinal);
-  Calculo list = new Calculo(ladoEsquerdo, ladoDireito, sinal);
+  list = new Calculo(ladoEsquerdo, ladoDireito, sinal);
   list.StringCalculada = StringCalculada;
   return list;
 }
