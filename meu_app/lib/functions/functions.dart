@@ -6,7 +6,11 @@ import 'package:meu_app/models/separarLadosdoIgual.dart';
 
 import 'calculo.dart';
 import 'incalculavel.dart';
+int baskaraFinish = -1;
 
+String inputA = "";
+String inputB = "";
+String inputC = "";
 isNumeric(String s) {
   if (s == null) {
     return false;
@@ -44,13 +48,118 @@ IsBaskara(String input){
   return false;
 
 }
-resolverBaskara(String input){
- pegarPartePrioritaria(input, indice)
-  if(IsBaskara(input)) {
-    double a = pegarParteComXQuadrado(input, indice);
-    double b = pegarParteComX(input, indice);
-    double c = pegarParteComXQuadrado(input, indice);
+calcularBaskara(String inputA, String inputB, String inputC){
+  String saidaA = inputA.replaceFirst("x^2", "");
+  String saidaB = inputB.replaceFirst("x", "");
+  double a = double.parse( isNumeric(saidaA) ? saidaA : "1");
+  double b = double.parse( isNumeric(saidaB) ? saidaB : "1");
+  double c = double.parse(inputC);
+  double potencia = pow( b, 2) as double;
+  double calculoTemp = 0.0;
+  calculoTemp = 4 * a * c ;
+  calculoTemp = potencia - calculoTemp;
+
+  double delta = calculoTemp;
+  double menosB = double.parse("-" + b.toString());
+  if(delta <= 0 ){
+   return [0.0,0.0];
   }
+  delta = sqrt(delta);
+  double parteDeCimaPositivo = menosB + delta;
+  double parteDeCimaNegativo = menosB - delta;
+  double parte2a = 2 * a;
+
+  double resultadoPositivo = parteDeCimaPositivo / parte2a;
+  double resultadoNegativo = parteDeCimaNegativo / parte2a;
+
+  return [resultadoNegativo,resultadoPositivo];
+
+}
+calcularXizes(String input){
+  if(input.contains("+x^2")){
+    input = input.replaceAll("+x^2","1");
+  }else if(input.contains("-x^2")){
+    input = input.replaceAll("-x^2","-1");
+  }
+  if(input.contains("x^2")){
+    input = input.replaceAll("x^2","");
+  }
+  input =  input.replaceAll("x", "");
+  Lados lados = separarLados(input);
+
+  String tempDireita = lados.direita;
+  while(!isNumeric(tempDireita)){
+    tempDireita = calcularParte(tempDireita);
+  }
+
+  double tempDouble = double.parse(tempDireita) * -1;
+
+  String tempEsquerda = lados.esquerda;
+  while(!isNumeric(tempEsquerda)){
+    tempEsquerda = calcularParte(tempEsquerda);
+  }
+
+  String resultado = addSinal(tempEsquerda) + addSinal(tempDireita);
+  resultado = calcularParte(resultado);
+
+  return resultado;
+
+}
+resolverBaskara(String input){
+  inputA = "";
+  inputB = "";
+  inputC = "";
+ int indice = encontrarIndicePrioridade(input);
+ Calculo partePrioritaria= new Calculo();
+ input = XParaEsquerda(input);
+ if(IsBaskara(input) || baskaraFinish != 2) {
+   baskaraFinish = 0;
+
+    while(input.contains("x^2") && baskaraFinish == 0){
+      indice = encontrarX(input);
+      partePrioritaria = pegarPartePrioritaria(input, indice);
+      inputA += addSinal(partePrioritaria.StringCalculada);
+      input = input.replaceFirst(partePrioritaria.StringCalculada, "");
+    }
+
+    if( baskaraFinish == 0) {
+      inputA = calcularParte(inputA);
+      baskaraFinish++;
+    }
+
+    while(input.contains("x") && !(input.contains("x^")) && baskaraFinish ==  1){
+      indice = encontrarX(input);
+      partePrioritaria = pegarPartePrioritaria(input, indice);
+      inputB +=  addSinal(partePrioritaria.StringCalculada);
+      input = input.replaceFirst(partePrioritaria.StringCalculada, "");
+    }
+
+    if(baskaraFinish == 1){
+      baskaraFinish++;
+      inputB = calcularParte(inputB);
+    }
+    input = input.replaceFirst("=", "");
+    while( !isNumeric(calcularTudo(input)) && baskaraFinish == 2){
+      input = calcularParte(input);
+    }
+
+    if(baskaraFinish == 2) {
+      inputC = input;
+    }
+
+     List<double> listResultados = calcularBaskara(inputA, inputB, inputC);
+     baskaraFinish = 2;
+    return listResultados;
+  }
+}
+calcularParte(String input){
+  int indice = encontrarIndicePrioridade(input);
+  if( !(indice <= 0) ){
+    Calculo calculo = pegarPartePrioritaria(input, indice);
+    if(calculo.num1 == "" || calculo.num2 == "")
+      input = calcularParteT(input, calculo);
+  }
+  return input;
 }
 separarLados(String input) {
   List<String> incalculavel1 = [];
@@ -87,13 +196,19 @@ resolverRaizesQ(String stringCompleta) {
 
 encontrarX(String input) {
   int indice1 = input.length;
-
-  if (input.contains("x")) {
-    indice1 = input.indexOf("x");
+  int indice2 = input.length;
+  if(input.contains("x^2")){
+    indice1 = input.indexOf("^");
+  }else
+  if(input.contains("x")){
+    indice2 = input.indexOf("x");
   }
-
-  if (indice1 != input.length) {
-    return indice1;
+  if (indice1 != input.length || indice2 != input.length) {
+    if (indice1 < indice2) {
+      return indice1 ;
+    } else {
+      return indice2 ;
+    }
   }
 
   return -1;
@@ -114,6 +229,7 @@ encontrarIndicePrioridade(String input) {
 
   int indice1 = input.length;
   int indice2 = input.length;
+
 
   if (input.contains("^")) {
     indice1 = input.indexOf("^");
@@ -158,14 +274,39 @@ encontrarIndicePrioridade(String input) {
 
   return -1;
 }
+XParaEsquerda(String input){
+  int indice = 0 ;
+  String saida= "";
+  String temp = "";
+  if(input.contains("=")){
+    List<String> partes = input.split("=");
+    String ladoEsquerdo = partes[0];
+    String ladoDireito = partes[1];
 
+    while(ladoDireito.contains("x")){
+      indice = encontrarX(ladoDireito);
+      temp += PegarEsquerdaSinal(ladoDireito, indice) + "x";
+      temp += PegarDireitoSinal(ladoDireito, indice);
+      saida += alterarSinal( addSinal(temp));
+      ladoDireito = ladoDireito.replaceFirst(temp, "");
+      temp = "";
+    }
+    while(!isNumeric(saida) && saida != ""){
+      saida = calcularParte(saida);
+    }
+    String TodosXProLadoEsquerdo= input;
+    if(saida != "")
+      TodosXProLadoEsquerdo = ladoEsquerdo + addSinal(saida) + "=" + ladoDireito;
+    return TodosXProLadoEsquerdo;
+  }
+}
 pegarParteComX(String input, int indice) {
   List<String> operations = ["+", "-", "X", "÷", "^"];
   String ladoEsquerdo = "";
   String sinal = "";
   print("pegarParteComX input :" +input);
   for (int i = indice - 1; i >= 0; i--) {
-    print("for pegarParte :"+input[i]);
+    print("for pegarParte :" + input[i]);
     if (isNumeric(input[i]) || input[i] == "-" || input[i] == ".") {
 
       ladoEsquerdo += input[i];
@@ -233,7 +374,13 @@ pegarPartePrioritaria(String input, int indice) {
   String ladoDireito = "";
   String sinal = input[indice];
   String StringCalculada="";
-  Calculo list= new Calculo(ladoEsquerdo, ladoDireito, sinal);
+  Calculo list= new Calculo();
+  list.sinal = sinal;
+
+  if(sinal == "x"){
+    list.StringCalculada = addSinal(PegarEsquerdaSinal(input, indice)) + "x";
+    return list;
+  }
   if(sinal == "√"){
     ladoEsquerdo = input.substring(indice+1,input.length);
     StringCalculada = sinal + ladoEsquerdo;
@@ -243,22 +390,24 @@ pegarPartePrioritaria(String input, int indice) {
 
       ladoEsquerdo = PegarEsquerdaSinal(input, indice);
       ladoDireito = PegarDireitoSinal(input, indice);
-      list = new Calculo(ladoEsquerdo, ladoDireito, sinal);
+      list.num1 = ladoEsquerdo;
+      list.num2 = ladoDireito;
+      list.sinal = sinal;
       list.StringCalculada = (ladoEsquerdo + sinal + ladoDireito);
       return list;
     }
   }
-  else
-  {
+
     ladoEsquerdo = PegarEsquerdaSinal(input, indice);
     ladoDireito = PegarDireitoSinal(input, indice);
 
     StringCalculada= ladoEsquerdo + sinal + ladoDireito;
-  }
+
   print(" 133 lado esquerdo=" + ladoEsquerdo);
   print("lado direito =" + ladoDireito);
   print(" 135 sinal = " + sinal);
-  list = new Calculo(ladoEsquerdo, ladoDireito, sinal);
+  list.num1  = ladoEsquerdo;
+  list.num2 = ladoDireito;
   list.StringCalculada = StringCalculada;
   return list;
 }
@@ -299,10 +448,15 @@ calcularTudo(String input) {
   String temParenteses = parenteses(input);
   String tempNum = "";
   double tempDouble = 0;
+
+
   if (temParenteses != "-1") {
     input = temParenteses;
   }
-
+  if(IsBaskara(input)){
+    List<double> listaBaskara = resolverBaskara(input);
+    return "Negative result " + listaBaskara[0].toString() +"    " + "Positive result  " + listaBaskara[1].toString();
+  }
   if (input.indexOf("=") != -1) {
     print(input);
 
@@ -313,7 +467,7 @@ calcularTudo(String input) {
     String apenasNumerosCalculados="";
     int indicePrioridade = -1;
     String numeroComX = "";
-    Calculo CalculoPrioritario= new Calculo("", "", "");
+    Calculo CalculoPrioritario= new Calculo();
     //futuramente while
     while(existNumeroComX(direita) != false){
       numeroComX = existNumeroComX(direita);
@@ -503,8 +657,8 @@ parenteses(String input) {
 
     int indicePrioridade = encontrarIndicePrioridade(input);
     Calculo listInputs = pegarPartePrioritaria(input, indicePrioridade);
-    String num1 = listInputs.num1Get;
-    String num2 = listInputs.num2Get;
+    String num1 = listInputs.num1;
+    String num2 = listInputs.num2;
     String sinal = listInputs.sinal;
 
     String resultado = calcularParteT(input, listInputs);
@@ -560,7 +714,10 @@ dividirPartes(String input) {
       }
     }
   }
-  Calculo list = new Calculo(num1, num2, sinal);
+  Calculo list = new Calculo();
+  list.num1 = num1;
+  list.num2 = num2;
+  list.sinal = sinal;
   print("256 Calculo \n num1=" +
       num1.toString() +
       "\n num2=" +
@@ -581,14 +738,14 @@ calcularParteT(String input, Calculo listInputs) {
 
   print(input);
   print("\n");
-  String input1 = listInputs.num1Get.toString();
-  String input2 = listInputs.num2Get.toString();
+  String input1 = listInputs.num1.toString();
+  String input2 = listInputs.num2.toString();
   String sinal = listInputs.sinal;
   double num2 = 0;
   double num1 = 0;
   String incalculavel = "";
   print("calcular tudo \n input1 = " + input1);
-  print(listInputs.num1Get);
+  print(listInputs.num1);
   if(sinal == "√"){
     stringCalculada = sinal + input1;
   }else
@@ -599,11 +756,11 @@ calcularParteT(String input, Calculo listInputs) {
   }
 
   if (isNumeric(input1)) {
-    num1 = double.parse(listInputs.num1Get);
+    num1 = double.parse(listInputs.num1);
   }
 
   if (isNumeric(input2)) {
-    num2 = double.parse(listInputs.num2Get);
+    num2 = double.parse(listInputs.num2);
   }
   print("289 num1=" + num1.toString() + "\n num2=" + num2.toString());
 

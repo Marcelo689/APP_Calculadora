@@ -32,7 +32,7 @@ class Memory {
         if (!(_value == calcularTudo(_value))) {
           _antesDoCalculo = _value;
         }
-
+        print("Resultado na tela " + calcularTudo(_value));
         _value = calcularTudo(_value);
       } catch (erro) {
         print(erro);
