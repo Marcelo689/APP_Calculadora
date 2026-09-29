@@ -1,17 +1,19 @@
-import "package:flutter/material.dart";
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 import 'package:meu_app/components/keyboard.dart';
 import 'package:meu_app/models/memory.dart';
-import "../components/display.dart";
+import '../components/display.dart';
 
 class Calculator extends StatefulWidget {
+  const Calculator({Key? key}) : super(key: key);
+
   @override
   State<Calculator> createState() => _CalculatorState();
 }
 
 class _CalculatorState extends State<Calculator> {
   final Memory memory = Memory();
-  _onPressed(String text) {
+
+  void _onPressed(String text) {
     setState(() {
       memory.applyCommand(text);
     });
@@ -19,14 +21,15 @@ class _CalculatorState extends State<Calculator> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
-    return MaterialApp(
-        home: Column(
-      children: <Widget>[
-        Display(memory.value),
-        Keyboard(_onPressed),
-      ],
-    ));
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: <Widget>[
+            Display(memory.value),
+            Keyboard(_onPressed),
+          ],
+        ),
+      ),
+    );
   }
 }
